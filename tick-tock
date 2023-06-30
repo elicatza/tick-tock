@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Check dependencies
+dependencies=( "notify-send" "flock" "pgrep" )
+for i in "${dependencies[@]}"; do
+    command -v $i > /dev/null 2>&1 || {
+        printf "${i} is required!\n";
+        exit 1;
+    }
+done
+
+# TODO: check environment variables
+icon=/usr/share/icons/Adwaita/96x96/status/alarm-symbolic.symbolic.png
+duration=1500
+lockfile="${XDG_CACHE_HOME}/tick-tock/lock"
+
+mkdir -p $(dirname $lockfile)
+{
+    if ! flock -n 9; then
+        notify-send "Tick-Tock Running" "$(ps -o etime:1= -p $(pgrep -f $0 | head -n 1))" -t "$duration" -i "$icon"
+        exit 1
+    fi
+
+    notify-send "Tick-Tock Started" -t "$duration" -i "$icon"; sleep 45m; notify-send "Tick-Tock Done!" -i "$icon"
+} 9> "${lockfile}"
+
+
+
