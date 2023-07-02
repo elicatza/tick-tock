@@ -1,0 +1,7 @@
+gcc
+-std=c99
+-pedantic
+-Wall
+-Wextra
+-Wshadow
+-Werror
