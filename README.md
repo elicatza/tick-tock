@@ -27,5 +27,7 @@ make uninstall
 ```
 
 ## TODO
+If tick-tock is killed the file will stay locked.
+
 Command line arguments for time and notify-send flags.
 There should also be a flag to reset timer.

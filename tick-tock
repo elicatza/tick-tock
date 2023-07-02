@@ -24,5 +24,3 @@ mkdir -p $(dirname $lockfile)
     notify-send "Tick-Tock Started" -t "$duration" -i "$icon"; sleep 45m; notify-send "Tick-Tock Done!" -i "$icon"
 } 9> "${lockfile}"
 
-
-
