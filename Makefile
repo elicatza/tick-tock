@@ -1,5 +1,7 @@
 CC ?= gcc
-CFLAGS := -std=c99 -pedantic -O0 -Wall -Wextra -Wshadow -Werror
+CFLAGS := -std=c99 -pedantic -Wall -Wextra -Wshadow -Werror \
+		  $(shell pkg-config --cflags --libs libnotify) \
+		  $(shell pkg-config --libs libprocps)
 COBJFLAGS := $(CFLAGS) -c
 
 SRCDIR := ./src
@@ -35,7 +37,7 @@ makedir:
 install:
 	chmod 755 $(TARGET)
 	mkdir -p $(PREFIX)/bin
-	cp $(TARGET) $(PREFIX)/bin/
+	cp -f $(TARGET) $(PREFIX)/bin/
 
 .PHONY: uninstall
 uninstall:
