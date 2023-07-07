@@ -1,7 +1,9 @@
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <assert.h>
+#include <unistd.h>
+
 #include <proc/readproc.h>
 
 #define LIBNOTIFY_DISABLE_DEPRECATED
@@ -10,6 +12,11 @@
 
 #define ICON "/usr/share/icons/Adwaita/96x96/status/alarm-symbolic.symbolic.png"
 
+gboolean is_readable(char *path)
+{
+    if (access(path, R_OK)) return 1;
+    return 0;
+}
 
 long get_uptime(void)
 {
@@ -72,29 +79,31 @@ int main(void)
 {
     notify_init("tick-tock");
 
+    char *icon = ICON;
+    if (!is_readable(ICON)) icon = NULL;
+
     size_t instances = 0;
     long time_diff = get_uptime() - (get_proc_start_ms("tick-tock", &instances) / 100);
 
-    NotifyNotification *note;
-
-    if (instances == 1) {
-        note = notify_notification_new("Tick-Tock Started", NULL, ICON);
-        notify_notification_set_timeout(note, 3000);
-        NOTIFY_DISPLAY(note);
-    } else {
+    // notify user and exit if program is already running
+    if (instances != 1) {
         char msg[32];
         long minutes = time_diff / 60;
         snprintf(msg, sizeof msg, "Uptime: %02ld:%02ld", minutes, time_diff - (minutes * 60));
 
-        note = notify_notification_new("Tick-Tock Running", msg, ICON);
+        NotifyNotification *note = notify_notification_new("Tick-Tock Running", msg, icon);
         notify_notification_set_timeout(note, 3000);
         NOTIFY_DISPLAY(note);
         return 0;
     }
 
+    NotifyNotification *note = notify_notification_new("Tick-Tock Started", NULL, icon);
+    notify_notification_set_timeout(note, 3000);
+    NOTIFY_DISPLAY(note);
+
 
     notify_notification_set_urgency(note, NOTIFY_URGENCY_CRITICAL);
-    NotifyNotification *end_note = notify_notification_new("Tick-Tock Done", NULL, ICON);
+    NotifyNotification *end_note = notify_notification_new("Tick-Tock Done", NULL, icon);
     notify_notification_set_timeout(end_note, 10 * 1000);
     sleep(60 * 45);
 
