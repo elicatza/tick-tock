@@ -2,8 +2,8 @@
 My pomodoro timer using system notifications.
 Only tested on Linux, but should work on other all systems with notify-send.
 
-## Requirements
-Building
+## Dependencies
+- [adwaita-icon-theme](https://gitlab.gnome.org/GNOME/adwaita-icon-theme)
 - [libnotify](https://gitlab.gnome.org/GNOME/libnotify)
 - [libprocps](https://gitlab.com/procps-ng/procps/)
 
@@ -24,7 +24,7 @@ sudo make install
 make uninstall
 
 # For local uninstall run:
-# make uninstall PREFIX=~/.local/bin
+# make uninstall PREFIX=~/.local
 ```
 
 ## TODO

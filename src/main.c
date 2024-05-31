@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,12 +11,12 @@
 #include <libnotify/notify.h>
 
 
-#define ICON "/usr/share/icons/Adwaita/96x96/status/alarm-symbolic.symbolic.png"
+#define ICON "/usr/share/icons/Adwaita/symbolic/status/alarm-symbolic.svg"
 
-gboolean is_readable(char *path)
+bool is_readable(char *path)
 {
-    if (access(path, R_OK)) return 1;
-    return 0;
+    if (access(path, R_OK) != 0) return false;
+    return true;
 }
 
 long get_uptime(void)
@@ -81,6 +82,7 @@ int main(void)
 
     char *icon = ICON;
     if (!is_readable(ICON)) icon = NULL;
+    fprintf(stderr, "[INFO] icon: %s\n", icon);
 
     size_t instances = 0;
     long time_diff = get_uptime() - (get_proc_start_ms("tick-tock", &instances) / 100);
