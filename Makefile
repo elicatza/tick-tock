@@ -1,37 +1,17 @@
 CC ?= gcc
-CFLAGS := -std=c99 -pedantic -Wall -Wextra -Wshadow -Werror \
-		  $(shell pkg-config --cflags --libs libnotify) \
-		  $(shell pkg-config --libs libprocps)
-COBJFLAGS := $(CFLAGS) -c
+CFLAGS := -std=c99 -pedantic -Wall -Wextra $(shell pkg-config --cflags libnotify)
+LIBS := $(shell pkg-config --libs libnotify) $(shell pkg-config --libs libprocps)
 
-SRCDIR := ./src
-OBJDIR := ./obj
-OUTDIR := ./bin
-
+PREFIX ?= /usr/local
 TARGET_NAME := tick-tock
-TARGET := $(OUTDIR)/$(TARGET_NAME)
+TARGET := build/$(TARGET_NAME)
 
-SRC := $(foreach x, $(SRCDIR), $(wildcard $(addprefix $(x)/*,.c*)))
-OBJ := $(addprefix $(OBJDIR)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
-
-CLEAN_LIST := $(OBJ) $(TARGET)
-PREFIX ?= /usr/local/bin
-
-
-default: makedir all
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(CC) -o $@ $< $(COBJFLAGS)
-
-
-.PHONY: makedir
-makedir:
-	@mkdir -p $(OUTDIR) $(SRCDIR) $(OBJDIR)
+$(TARGET): src/main.c
+	mkdir -p build
+	$(CC) -o $@ $(CFLAGS) $^ $(LIBS)
 
 .PHONY: install
 install:
@@ -42,7 +22,3 @@ install:
 .PHONY: uninstall
 uninstall:
 	rm -f $(PREFIX)/bin/$(TARGET_NAME)
-
-.PHONY: clean
-clean:
-	@rm -f $(CLEAN_LIST)
